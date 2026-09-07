@@ -43,6 +43,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    // defining a circularBuffer for our project
+    juce::AudioBuffer<float> circularBuffer;
+    int writePosition { 0 }; // write position inside the circularBuffer initialized at 0
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GranularTextureEngineAudioProcessor)
 };

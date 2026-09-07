@@ -86,9 +86,9 @@ void GranularTextureEngineAudioProcessor::changeProgramName (int index, const ju
 //==============================================================================
 void GranularTextureEngineAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    // set size of circularBuffer
+    auto circularBufferSize = sampleRate * 2.0; // 2 seconds of sound
+    circularBuffer.setSize(getTotalNumOutputChannels(), (int)circularBufferSize);
 }
 
 void GranularTextureEngineAudioProcessor::releaseResources()
@@ -130,27 +130,33 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+    auto bufferSize = buffer.getNumSamples();
+    auto circularBufferSize = circularBuffer.getNumSamples();
+
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-        // ..do something to the data...
+
+        if (circularBufferSize > bufferSize + writePosition) {
+            // if we can copy without wraparound
+            // copy main buffer to circularBuffer
+            circularBuffer.copyFromWithRamp(channel, writePosition, channelData, bufferSize, 0.1f, 0.1f);
+        } else {
+            auto numSamplesToEnd = circularBufferSize - writePosition; // gives remaining spaces until the end
+            auto numSamplesFromStart = bufferSize - numSamplesToEnd; // gives number of samples to copy at the start
+
+            // copy samples from buffer to end of circularbuffer
+            circularBuffer.copyFromWithRamp(channel, writePosition, channelData, numSamplesToEnd, 0.1f, 0.1f);
+            // copy remaining samples from buffer at the start of circularbuffer
+            circularBuffer.copyFromWithRamp(channel, 0, channelData, numSamplesFromStart, 0.1f, 0.1f);
+        }
     }
+
+    writePosition += bufferSize;
+    writePosition %= circularBufferSize;
 }
 
 //==============================================================================
