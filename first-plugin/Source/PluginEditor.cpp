@@ -35,5 +35,5 @@ void HelloWorldPluginAudioProcessorEditor::resized() {
 }
 
 void HelloWorldPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
-    processorRef.noteOnVel = midiVolume.getValue();
+    processorRef.noteOnVel = (float)midiVolume.getValue();
 }
