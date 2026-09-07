@@ -1,5 +1,5 @@
 juce_add_plugin(GranularTexture
-    COMPANY_NAME "Juul"
+    COMPANY_NAME "Juul C."
     PLUGIN_MANUFACTURER_CODE Juul
     PLUGIN_CODE Gtex
     FORMATS AU Standalone
