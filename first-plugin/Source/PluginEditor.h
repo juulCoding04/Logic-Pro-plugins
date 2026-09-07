@@ -2,7 +2,8 @@
 #include "PluginProcessor.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
-class HelloWorldPluginAudioProcessorEditor : public juce::AudioProcessorEditor
+class HelloWorldPluginAudioProcessorEditor : public juce::AudioProcessorEditor,
+                                                    juce::Slider::Listener
 {
 public:
     HelloWorldPluginAudioProcessorEditor (HelloWorldPluginAudioProcessor&);
@@ -13,6 +14,9 @@ public:
 
 private:
     HelloWorldPluginAudioProcessor& processorRef;
+
+    // default callback function
+    void sliderValueChanged(juce::Slider* slider) override;
 
     // create a slider object to controll midi volume
     juce::Slider midiVolume;

@@ -16,6 +16,9 @@ HelloWorldPluginAudioProcessorEditor::HelloWorldPluginAudioProcessorEditor (Hell
 
     // adds slider to the editor
     addAndMakeVisible (&midiVolume);
+
+    // add slider listener to the volume slider
+    midiVolume.addListener(this);
 }
 
 void HelloWorldPluginAudioProcessorEditor::paint (juce::Graphics& g)
@@ -29,4 +32,8 @@ void HelloWorldPluginAudioProcessorEditor::paint (juce::Graphics& g)
 void HelloWorldPluginAudioProcessorEditor::resized() {
     // sets the position and size of the slider with arguments (x, y, width, height)
     midiVolume.setBounds (40, 30, 20, getHeight() - 60);
+}
+
+void HelloWorldPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
+    processorRef.noteOnVel = midiVolume.getValue();
 }
