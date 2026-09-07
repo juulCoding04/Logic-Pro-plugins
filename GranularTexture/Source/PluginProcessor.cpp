@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "juce_core/juce_core.h"
 
 //==============================================================================
 GranularTextureEngineAudioProcessor::GranularTextureEngineAudioProcessor()
@@ -89,6 +90,15 @@ void GranularTextureEngineAudioProcessor::prepareToPlay (double sampleRate, int 
     // set size of circularBuffer
     auto circularBufferSize = sampleRate * 2.0; // 2 seconds of sound
     circularBuffer.setSize(getTotalNumOutputChannels(), (int)circularBufferSize);
+    circularBuffer.clear();
+
+    writePosition = 0;
+
+    // temporary test grain
+    g.startSample   = 0;
+    g.lengthSamples = 24000;
+    g.currentSample = g.startSample;
+    g.progress      = 0;
 }
 
 void GranularTextureEngineAudioProcessor::releaseResources()
@@ -127,33 +137,117 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     juce::ignoreUnused (midiMessages);
 
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    auto bufferSize = buffer.getNumSamples();
-    auto circularBufferSize = circularBuffer.getNumSamples();
+    const int totalNumInputChannels  = getTotalNumInputChannels();
+    const int totalNumOutputChannels = getTotalNumOutputChannels();
 
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    const int bufferSize = buffer.getNumSamples();
+    const int circularBufferSize = circularBuffer.getNumSamples();
+
+    if (circularBufferSize <= 0 || bufferSize <= 0)
+        return;
+
+    // Clear unused output channels
+    for (int channel = totalNumInputChannels;
+         channel < totalNumOutputChannels;
+         ++channel)
+    {
+        buffer.clear(channel, 0, bufferSize);
+    }
+
+    // write input to circular buffer
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
+        auto* channelData = buffer.getWritePointer(channel);
 
-        if (circularBufferSize > bufferSize + writePosition) {
-            // if we can copy without wraparound
-            // copy main buffer to circularBuffer
-            circularBuffer.copyFromWithRamp(channel, writePosition, channelData, bufferSize, 0.1f, 0.1f);
-        } else {
-            auto numSamplesToEnd = circularBufferSize - writePosition; // gives remaining spaces until the end
-            auto numSamplesFromStart = bufferSize - numSamplesToEnd; // gives number of samples to copy at the start
+        if (writePosition + bufferSize <= circularBufferSize)
+        {
+            // No wraparound
+            circularBuffer.copyFrom(
+                channel,
+                writePosition,
+                channelData,
+                bufferSize);
+        }
+        else
+        {
+            // Wraparound
+            const int numSamplesToEnd =
+                circularBufferSize - writePosition;
 
-            // copy samples from buffer to end of circularbuffer
-            circularBuffer.copyFromWithRamp(channel, writePosition, channelData, numSamplesToEnd, 0.1f, 0.1f);
-            // copy remaining samples from buffer at the start of circularbuffer
-            circularBuffer.copyFromWithRamp(channel, 0, channelData, numSamplesFromStart, 0.1f, 0.1f);
+            const int numSamplesFromStart =
+                bufferSize - numSamplesToEnd;
+
+            // First part -> end of circular buffer
+            circularBuffer.copyFrom(
+                channel,
+                writePosition,
+                channelData,
+                numSamplesToEnd);
+
+            // Remaining part -> beginning of circular buffer
+            circularBuffer.copyFrom(
+                channel,
+                0,
+                channelData + numSamplesToEnd,
+                numSamplesFromStart);
         }
     }
+
+    // read grain
+
+    const int samplesLeft = juce::jmax(0, g.lengthSamples - g.progress);
+
+    const int samplesToRead = juce::jmin(bufferSize, samplesLeft);
+
+    if (samplesToRead > 0)
+    {
+        int readPosition = g.currentSample;
+        readPosition %= circularBufferSize;
+
+        for (int channel = 0; channel < totalNumInputChannels; ++channel)
+        {
+            if (readPosition + samplesToRead <= circularBufferSize)
+            {
+                // No wraparound
+                buffer.copyFrom(
+                    channel,
+                    0,
+                    circularBuffer.getReadPointer(channel, readPosition),
+                    samplesToRead);
+            }
+            else
+            {
+                // Grain wraps around circular buffer
+                const int numSamplesToEnd =
+                    circularBufferSize - readPosition;
+
+                const int numSamplesFromStart =
+                    samplesToRead - numSamplesToEnd;
+
+                buffer.copyFrom(
+                    channel,
+                    0,
+                    circularBuffer.getReadPointer(channel, readPosition),
+                    numSamplesToEnd);
+
+                buffer.copyFrom(
+                    channel,
+                    numSamplesToEnd,
+                    circularBuffer.getReadPointer(channel, 0),
+                    numSamplesFromStart);
+            }
+        }
+
+        // Advance grain ONCE, after processing all channels
+        g.currentSample += samplesToRead;
+        g.currentSample %= circularBufferSize;
+
+        g.progress += samplesToRead;
+    }
+
+    // advance circular buffer once
 
     writePosition += bufferSize;
     writePosition %= circularBufferSize;

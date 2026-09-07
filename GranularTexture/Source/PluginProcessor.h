@@ -2,6 +2,14 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+struct Grain {
+    int startSample;
+    int lengthSamples;
+    int currentSample;
+    int endSample;
+    int progress;
+};
+
 //==============================================================================
 class GranularTextureEngineAudioProcessor final : public juce::AudioProcessor
 {
@@ -46,6 +54,8 @@ private:
     // defining a circularBuffer for our project
     juce::AudioBuffer<float> circularBuffer;
     int writePosition { 0 }; // write position inside the circularBuffer initialized at 0
+
+    Grain g;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GranularTextureEngineAudioProcessor)
