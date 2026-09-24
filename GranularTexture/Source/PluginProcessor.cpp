@@ -94,9 +94,12 @@ void GranularTextureEngineAudioProcessor::prepareToPlay (double sampleRate, int 
 
     writePosition = 0;
 
+    int grainRateSamples = static_cast<int>(sampleRate / 4.0); // 4 grains/sec
+    scheduler.reset(grainRateSamples);
+
     // temporary test grain
     g.startSample   = 0;
-    g.lengthSamples = 24000;
+    g.lengthSamples = static_cast<int>(sampleRate * 0.1); // about 100ms grains
     g.currentSample = g.startSample;
     g.progress      = 0;
 }
@@ -196,6 +199,14 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     }
 
     buffer.clear();
+
+    if (scheduler.tick()) {
+        g.currentSample = writePosition - g.lengthSamples;
+        if (g.currentSample < 0) {
+            g.currentSample += circularBufferSize;
+        }
+        g.progress = 0;
+    }
 
     // read grain
 

@@ -5,6 +5,11 @@ GrainScheduler::GrainScheduler(int samples) {
     intervalSamples = samples;
 }
 
+void GrainScheduler::reset(int samples) {
+    samplesUntilNextGrain = samples;
+    intervalSamples = samples;
+}
+
 bool GrainScheduler::tick() {
     samplesUntilNextGrain -= 1;
     if (samplesUntilNextGrain <= 0) {

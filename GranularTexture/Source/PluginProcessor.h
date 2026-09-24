@@ -57,6 +57,8 @@ private:
     juce::AudioBuffer<float> circularBuffer;
     int writePosition { 0 }; // write position inside the circularBuffer initialized at 0
 
+    GrainScheduler scheduler;
+
     Grain g;
 
     //==============================================================================
