@@ -23,7 +23,7 @@ void GranularTextureEngineAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("v0.1.0", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("v0.1.1", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void GranularTextureEngineAudioProcessorEditor::resized()

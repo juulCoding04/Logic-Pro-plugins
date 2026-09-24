@@ -10,10 +10,10 @@ void GrainScheduler::reset(int samples) {
     intervalSamples = samples;
 }
 
-bool GrainScheduler::tick() {
-    samplesUntilNextGrain -= 1;
+bool GrainScheduler::tick(int numSamples) {
+    samplesUntilNextGrain -= numSamples;
     if (samplesUntilNextGrain <= 0) {
-        samplesUntilNextGrain = intervalSamples;
+        samplesUntilNextGrain += intervalSamples;
         return true;
     }
 

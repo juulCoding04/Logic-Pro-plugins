@@ -200,7 +200,7 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
 
     buffer.clear();
 
-    if (scheduler.tick()) {
+    if (scheduler.tick(bufferSize)) {
         g.currentSample = writePosition - g.lengthSamples;
         if (g.currentSample < 0) {
             g.currentSample += circularBufferSize;
