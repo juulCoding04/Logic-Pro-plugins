@@ -195,6 +195,8 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
         }
     }
 
+    buffer.clear();
+
     // read grain
 
     const int samplesLeft = juce::jmax(0, g.lengthSamples - g.progress);
