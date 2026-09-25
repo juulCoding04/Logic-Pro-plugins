@@ -3,7 +3,7 @@ Personal collection of JUCE audio plugins, built while learning JUCE/DSP for tri
 
 ## Plugins
   - [`first-plugin/`](first-plugin/) — "Hello World" tutorial plugin, used to learn JUCE/CMake basics
-  - [`granular-texture-engine/`](granular-texture-engine/) — granular texture effect for trip-hop/techno/lo-fi
+  - [`GranularTexture/`](GranularTexture/) — granular texture effect for trip-hop/techno/lo-fi
 
 ## License
 This project is built on JUCE, used under its AGPLv3 license terms, which means this project is open source too. Licensed under GPLv3.
