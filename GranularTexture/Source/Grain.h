@@ -1,3 +1,5 @@
+#include <math.h>
+
 class Grain {
 public:
     Grain() = default;
@@ -11,6 +13,7 @@ public:
 
     void start(int newStartSample, int newLengthSamples);
     void advance(int samplesRead, int circularBufferSize);
+    float getEnvValue();
 
 private:
     int startSample = 0;
