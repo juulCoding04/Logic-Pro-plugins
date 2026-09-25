@@ -217,48 +217,18 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
         const int samplesLeft = juce::jmax(0, grains[i].getLengthSamples() - grains[i].getProgress());
         const int samplesToRead = juce::jmin(bufferSize, samplesLeft);
 
-        if (samplesToRead > 0)
-        {
-            int readPosition = grains[i].getCurrentSample();
-            readPosition %= circularBufferSize;
+        for (int s = 0; s < samplesToRead; s++) {
+            int readPosition = (grains[i].getCurrentSample() + s) % circularBufferSize;
+            float envValue = grains[i].getEnvValue(grains[i].getProgress() + s);
 
-            for (int channel = 0; channel < totalNumInputChannels; ++channel)
-            {
-                if (readPosition + samplesToRead <= circularBufferSize)
-                {
-                    // No wraparound
-                    buffer.addFrom(
-                        channel,
-                        0,
-                        circularBuffer.getReadPointer(channel, readPosition),
-                        samplesToRead);
-                }
-                else
-            {
-                    // Grain wraps around circular buffer
-                    const int numSamplesToEnd =
-                        circularBufferSize - readPosition;
-
-                    const int numSamplesFromStart =
-                        samplesToRead - numSamplesToEnd;
-
-                    buffer.addFrom(
-                        channel,
-                        0,
-                        circularBuffer.getReadPointer(channel, readPosition),
-                        numSamplesToEnd);
-
-                    buffer.addFrom(
-                        channel,
-                        numSamplesToEnd,
-                        circularBuffer.getReadPointer(channel, 0),
-                        numSamplesFromStart);
-                }
+            for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+                float rawSample = circularBuffer.getSample(channel, readPosition);
+                float* outputSample = buffer.getWritePointer(channel) + s;
+                *outputSample += rawSample * envValue;
             }
-
-            // Advance grain ONCE, after processing all channels
-            grains[i].advance(samplesToRead, circularBufferSize);
         }
+        // Advance grain ONCE, after processing all channels
+        grains[i].advance(samplesToRead, circularBufferSize);
     }
 
     // advance circular buffer once
