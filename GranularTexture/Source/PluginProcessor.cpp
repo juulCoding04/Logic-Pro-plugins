@@ -2,8 +2,6 @@
 #include "PluginEditor.h"
 #include "juce_core/juce_core.h"
 
-#define GRAIN_LEN 600
-
 //==============================================================================
 GranularTextureEngineAudioProcessor::GranularTextureEngineAudioProcessor()
      : AudioProcessor (BusesProperties()

@@ -6,6 +6,8 @@
 #include "Scheduler.h"
 #include "Grain.h"
 
+#define GRAIN_LEN 3000
+
 //==============================================================================
 class GranularTextureEngineAudioProcessor final : public juce::AudioProcessor
 {
