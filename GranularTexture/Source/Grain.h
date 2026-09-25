@@ -13,7 +13,7 @@ public:
 
     void start(int newStartSample, int newLengthSamples);
     void advance(int samplesRead, int circularBufferSize);
-    float getEnvValue();
+    float getEnvValue(int sample);
 
 private:
     int startSample = 0;
