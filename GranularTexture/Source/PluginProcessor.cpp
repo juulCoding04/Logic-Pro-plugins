@@ -2,6 +2,8 @@
 #include "PluginEditor.h"
 #include "juce_core/juce_core.h"
 
+#define GRAIN_LEN 600
+
 //==============================================================================
 GranularTextureEngineAudioProcessor::GranularTextureEngineAudioProcessor()
      : AudioProcessor (BusesProperties()
@@ -96,12 +98,6 @@ void GranularTextureEngineAudioProcessor::prepareToPlay (double sampleRate, int 
 
     int grainRateSamples = static_cast<int>(sampleRate / 4.0); // 4 grains/sec
     scheduler.reset(grainRateSamples);
-
-    // temporary test grain
-    g.startSample   = 0;
-    g.lengthSamples = static_cast<int>(sampleRate * 0.1); // about 100ms grains
-    g.currentSample = g.startSample;
-    g.progress      = 0;
 }
 
 void GranularTextureEngineAudioProcessor::releaseResources()
@@ -201,67 +197,73 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     buffer.clear();
 
     if (scheduler.tick(bufferSize)) {
-        g.currentSample = writePosition - g.lengthSamples;
-        if (g.currentSample < 0) {
-            g.currentSample += circularBufferSize;
+        for (int i = 0; i < grains.size(); i++) {
+            if (grains[i].isIdle()) {
+                int newCurrent = writePosition - GRAIN_LEN;
+                if (newCurrent < 0) {
+                    newCurrent += circularBufferSize;
+                }
+                grains[i].start(newCurrent, GRAIN_LEN);
+                break;
+            }
         }
-        g.progress = 0;
+        // all grains busy
     }
 
-    // read grain
+    // read active grains
+    
+    for (int i = 0; i < grains.size(); i++) {
+        if (grains[i].isIdle())
+            continue; // grain is idle so nothing to read
 
-    const int samplesLeft = juce::jmax(0, g.lengthSamples - g.progress);
+        const int samplesLeft = juce::jmax(0, grains[i].getLengthSamples() - grains[i].getProgress());
+        const int samplesToRead = juce::jmin(bufferSize, samplesLeft);
 
-    const int samplesToRead = juce::jmin(bufferSize, samplesLeft);
-
-    if (samplesToRead > 0)
-    {
-        int readPosition = g.currentSample;
-        readPosition %= circularBufferSize;
-
-        for (int channel = 0; channel < totalNumInputChannels; ++channel)
+        if (samplesToRead > 0)
         {
-            if (readPosition + samplesToRead <= circularBufferSize)
+            int readPosition = grains[i].getCurrentSample();
+            readPosition %= circularBufferSize;
+
+            for (int channel = 0; channel < totalNumInputChannels; ++channel)
             {
-                // No wraparound
-                buffer.copyFrom(
-                    channel,
-                    0,
-                    circularBuffer.getReadPointer(channel, readPosition),
-                    samplesToRead);
-            }
-            else
+                if (readPosition + samplesToRead <= circularBufferSize)
+                {
+                    // No wraparound
+                    buffer.addFrom(
+                        channel,
+                        0,
+                        circularBuffer.getReadPointer(channel, readPosition),
+                        samplesToRead);
+                }
+                else
             {
-                // Grain wraps around circular buffer
-                const int numSamplesToEnd =
-                    circularBufferSize - readPosition;
+                    // Grain wraps around circular buffer
+                    const int numSamplesToEnd =
+                        circularBufferSize - readPosition;
 
-                const int numSamplesFromStart =
-                    samplesToRead - numSamplesToEnd;
+                    const int numSamplesFromStart =
+                        samplesToRead - numSamplesToEnd;
 
-                buffer.copyFrom(
-                    channel,
-                    0,
-                    circularBuffer.getReadPointer(channel, readPosition),
-                    numSamplesToEnd);
+                    buffer.addFrom(
+                        channel,
+                        0,
+                        circularBuffer.getReadPointer(channel, readPosition),
+                        numSamplesToEnd);
 
-                buffer.copyFrom(
-                    channel,
-                    numSamplesToEnd,
-                    circularBuffer.getReadPointer(channel, 0),
-                    numSamplesFromStart);
+                    buffer.addFrom(
+                        channel,
+                        numSamplesToEnd,
+                        circularBuffer.getReadPointer(channel, 0),
+                        numSamplesFromStart);
+                }
             }
+
+            // Advance grain ONCE, after processing all channels
+            grains[i].advance(samplesToRead, circularBufferSize);
         }
-
-        // Advance grain ONCE, after processing all channels
-        g.currentSample += samplesToRead;
-        g.currentSample %= circularBufferSize;
-
-        g.progress += samplesToRead;
     }
 
     // advance circular buffer once
-
     writePosition += bufferSize;
     writePosition %= circularBufferSize;
 }

@@ -9,7 +9,8 @@ juce_add_plugin(GranularTexture
 target_sources(GranularTexture PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
-    Source/Scheduler.cpp)
+    Source/Scheduler.cpp
+    Source/Grain.cpp)
 
 target_link_libraries(GranularTexture PRIVATE
     juce::juce_audio_utils

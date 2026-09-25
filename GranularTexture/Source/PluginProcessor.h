@@ -1,16 +1,10 @@
 #pragma once
 
+#include <array>
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Scheduler.h"
-
-struct Grain {
-    int startSample;
-    int lengthSamples;
-    int currentSample;
-    int endSample;
-    int progress;
-};
+#include "Grain.h"
 
 //==============================================================================
 class GranularTextureEngineAudioProcessor final : public juce::AudioProcessor
@@ -59,7 +53,7 @@ private:
 
     GrainScheduler scheduler;
 
-    Grain g;
+    std::array<Grain, 2> grains;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GranularTextureEngineAudioProcessor)
