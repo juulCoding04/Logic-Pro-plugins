@@ -1,4 +1,6 @@
 #include "PluginProcessor.h"
+#include "juce_graphics/juce_graphics.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 #include "PluginEditor.h"
 
 //==============================================================================
@@ -9,6 +11,15 @@ GranularTextureEngineAudioProcessorEditor::GranularTextureEngineAudioProcessorEd
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
+
+    // define parameters for the grain length slider
+    grainLength.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    grainLength.setRange(0.0, 500.0, 1.0);
+    grainLength.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    grainLength.setPopupDisplayEnabled(true, false, this);
+    grainLength.setValue(200.0);
+
+    addAndMakeVisible(&grainLength);
 }
 
 GranularTextureEngineAudioProcessorEditor::~GranularTextureEngineAudioProcessorEditor()
@@ -19,15 +30,15 @@ GranularTextureEngineAudioProcessorEditor::~GranularTextureEngineAudioProcessorE
 void GranularTextureEngineAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (juce::Colours::white);
 
-    g.setColour (juce::Colours::white);
+    g.setColour (juce::Colours::black);
     g.setFont (15.0f);
-    g.drawFittedText ("v0.2.3", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("v0.3.1", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void GranularTextureEngineAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    // set position with arguments (x, y, width, height)
+    grainLength.setBounds(40, 30, 100, 100);
 }
