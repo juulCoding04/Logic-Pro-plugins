@@ -13,13 +13,16 @@ GranularTextureEngineAudioProcessorEditor::GranularTextureEngineAudioProcessorEd
     setSize (400, 300);
 
     // define parameters for the grain length slider
-    grainLength.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    grainLength.setRange(0.0, 500.0, 1.0);
-    grainLength.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
-    grainLength.setPopupDisplayEnabled(true, false, this);
-    grainLength.setValue(200.0);
+    grainLengthKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    grainLengthKnob.setRange(0.0, 500.0, 1.0);
+    grainLengthKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    grainLengthKnob.setPopupDisplayEnabled(true, false, this);
+    grainLengthKnob.setValue(200.0);
 
-    addAndMakeVisible(&grainLength);
+    addAndMakeVisible(&grainLengthKnob);
+
+    // add listener to slider
+    grainLengthKnob.addListener(this);
 }
 
 GranularTextureEngineAudioProcessorEditor::~GranularTextureEngineAudioProcessorEditor()
@@ -34,11 +37,16 @@ void GranularTextureEngineAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::black);
     g.setFont (15.0f);
-    g.drawFittedText ("v0.3.1", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("v0.3.2", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void GranularTextureEngineAudioProcessorEditor::resized()
 {
     // set position with arguments (x, y, width, height)
-    grainLength.setBounds(40, 30, 100, 100);
+    grainLengthKnob.setBounds(40, 30, 100, 100);
+}
+
+void GranularTextureEngineAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
+    double ms = grainLengthKnob.getValue();
+    processorRef.grainLength = static_cast<int>(ms * processorRef.getSampleRate() / 1000.0);
 }

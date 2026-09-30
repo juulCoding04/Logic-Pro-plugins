@@ -6,8 +6,6 @@
 #include "Scheduler.h"
 #include "Grain.h"
 
-#define GRAIN_LEN 3000
-
 //==============================================================================
 class GranularTextureEngineAudioProcessor final : public juce::AudioProcessor
 {
@@ -47,6 +45,10 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+    // public variables that can be controlled by the UI
+
+    float grainLength;
 
 private:
     // defining a circularBuffer for our project

@@ -197,11 +197,11 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     if (scheduler.tick(bufferSize)) {
         for (int i = 0; i < grains.size(); i++) {
             if (grains[i].isIdle()) {
-                int newCurrent = writePosition - GRAIN_LEN;
+                int newCurrent = writePosition - grainLength;
                 if (newCurrent < 0) {
                     newCurrent += circularBufferSize;
                 }
-                grains[i].start(newCurrent, GRAIN_LEN);
+                grains[i].start(newCurrent, grainLength);
                 break;
             }
         }
