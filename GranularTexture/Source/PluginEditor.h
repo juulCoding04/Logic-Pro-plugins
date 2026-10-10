@@ -1,10 +1,11 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
 //==============================================================================
-class GranularTextureEngineAudioProcessorEditor final : public juce::AudioProcessorEditor, private juce::Slider::Listener
+class GranularTextureEngineAudioProcessorEditor final : public juce::AudioProcessorEditor
 {
 public:
     explicit GranularTextureEngineAudioProcessorEditor (GranularTextureEngineAudioProcessor&);
@@ -15,7 +16,6 @@ public:
     void resized() override;
 
 private:
-    void sliderValueChanged (juce::Slider* slider) override;
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     GranularTextureEngineAudioProcessor& processorRef;

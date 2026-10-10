@@ -5,6 +5,7 @@
 
 #include "Scheduler.h"
 #include "Grain.h"
+#include "juce_audio_processors_headless/juce_audio_processors_headless.h"
 
 //==============================================================================
 class GranularTextureEngineAudioProcessor final : public juce::AudioProcessor
@@ -46,9 +47,8 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    // public variables that can be controlled by the UI
-
-    float grainLength;
+    //==============================================================================
+    juce::AudioProcessorValueTreeState parameters;
 
 private:
     // defining a circularBuffer for our project
@@ -58,6 +58,8 @@ private:
     GrainScheduler scheduler;
 
     std::array<Grain, 2> grains;
+
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GranularTextureEngineAudioProcessor)

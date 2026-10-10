@@ -1,5 +1,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_audio_processors_headless/juce_audio_processors_headless.h"
 #include "juce_core/juce_core.h"
 
 //==============================================================================
@@ -11,12 +13,25 @@ GranularTextureEngineAudioProcessor::GranularTextureEngineAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), parameters(*this, nullptr, "Parameters", createParameterLayout())
 {
 }
 
 GranularTextureEngineAudioProcessor::~GranularTextureEngineAudioProcessor()
 {
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout GranularTextureEngineAudioProcessor::createParameterLayout() {
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID{"grainLength", 1},
+        "Grain Length",
+        juce::NormalisableRange<float>(5.0f, 500.0f, 1.0f, 0.5f),
+        200.0f
+    ));
+
+    return layout;
 }
 
 //==============================================================================
@@ -193,6 +208,9 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     }
 
     buffer.clear();
+
+    float grainMs = parameters.getRawParameterValue("grainLength")->load();
+    float grainLength = static_cast<int>(grainMs * getSampleRate() / 1000.0);
 
     if (scheduler.tick(bufferSize)) {
         for (int i = 0; i < grains.size(); i++) {

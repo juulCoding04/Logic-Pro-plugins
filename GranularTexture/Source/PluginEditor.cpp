@@ -20,9 +20,6 @@ GranularTextureEngineAudioProcessorEditor::GranularTextureEngineAudioProcessorEd
     grainLengthKnob.setValue(200.0);
 
     addAndMakeVisible(&grainLengthKnob);
-
-    // add listener to slider
-    grainLengthKnob.addListener(this);
 }
 
 GranularTextureEngineAudioProcessorEditor::~GranularTextureEngineAudioProcessorEditor()
@@ -37,16 +34,11 @@ void GranularTextureEngineAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::black);
     g.setFont (15.0f);
-    g.drawFittedText ("v0.3.2", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("v0.3.4", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void GranularTextureEngineAudioProcessorEditor::resized()
 {
     // set position with arguments (x, y, width, height)
     grainLengthKnob.setBounds(40, 30, 100, 100);
-}
-
-void GranularTextureEngineAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
-    double ms = grainLengthKnob.getValue();
-    processorRef.grainLength = static_cast<int>(ms * processorRef.getSampleRate() / 1000.0);
 }
