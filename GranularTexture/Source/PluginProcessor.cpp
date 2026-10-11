@@ -3,6 +3,7 @@
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_audio_processors_headless/juce_audio_processors_headless.h"
 #include "juce_core/juce_core.h"
+#include <memory>
 
 //==============================================================================
 GranularTextureEngineAudioProcessor::GranularTextureEngineAudioProcessor()
@@ -29,6 +30,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout GranularTextureEngineAudioPr
         "Grain Length",
         juce::NormalisableRange<float>(5.0f, 500.0f, 1.0f, 0.5f),
         200.0f
+    ));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID{"grainRate", 1},
+        "Grain Rate Hz",
+        juce::NormalisableRange<float>(0.5f, 100.0f, 0.5f, 0.5f),
+        4.0f
     ));
 
     return layout;
@@ -109,7 +117,8 @@ void GranularTextureEngineAudioProcessor::prepareToPlay (double sampleRate, int 
 
     writePosition = 0;
 
-    int grainRateSamples = static_cast<int>(sampleRate / 4.0); // 4 grains/sec
+    const float grainRateHz = parameters.getRawParameterValue("grainRate")->load();
+    int grainRateSamples = static_cast<int>(sampleRate / grainRateHz);
     scheduler.reset(grainRateSamples);
 }
 
