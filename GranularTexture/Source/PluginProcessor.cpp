@@ -262,7 +262,7 @@ bool GranularTextureEngineAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* GranularTextureEngineAudioProcessor::createEditor()
 {
-    return new GranularTextureEngineAudioProcessorEditor (*this);
+    return new GranularTextureEngineAudioProcessorEditor (*this, parameters);
 }
 
 //==============================================================================

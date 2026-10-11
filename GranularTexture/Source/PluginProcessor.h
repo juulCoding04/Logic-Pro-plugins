@@ -48,9 +48,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    juce::AudioProcessorValueTreeState parameters;
 
 private:
+    juce::AudioProcessorValueTreeState parameters;
+
     // defining a circularBuffer for our project
     juce::AudioBuffer<float> circularBuffer;
     int writePosition { 0 }; // write position inside the circularBuffer initialized at 0
