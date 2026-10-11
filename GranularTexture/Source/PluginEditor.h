@@ -5,6 +5,8 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 #include <memory>
 
+#define VERSION "v1.0.4"
+
 typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
 //==============================================================================
@@ -24,6 +26,7 @@ private:
     GranularTextureEngineAudioProcessor& processorRef;
     juce::AudioProcessorValueTreeState& valueTreeState;
 
+    juce::Label grainLengthLabel;
     juce::Slider grainLengthKnob;
     std::unique_ptr<SliderAttachment> grainLenghtAttachement;
 

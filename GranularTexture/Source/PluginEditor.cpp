@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_events/juce_events.h"
 #include "juce_graphics/juce_graphics.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "PluginEditor.h"
@@ -12,12 +13,15 @@ GranularTextureEngineAudioProcessorEditor::GranularTextureEngineAudioProcessorEd
     // editor's size to whatever you need it to be.
     setSize (400, 300);
 
-    // define parameters for the grain length slider
+    // --- grain length ---
     grainLengthKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     grainLengthKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     grainLengthKnob.setPopupDisplayEnabled(true, false, this);
-
     addAndMakeVisible(&grainLengthKnob);
+
+    grainLengthLabel.setText("Grain Length", juce::dontSendNotification);
+    grainLengthLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    grainLengthLabel.attachToComponent(&grainLengthKnob, false);
 
     grainLenghtAttachement.reset(new SliderAttachment (valueTreeState, "grainLength", grainLengthKnob));
 }
@@ -34,7 +38,7 @@ void GranularTextureEngineAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::black);
     g.setFont (15.0f);
-    g.drawFittedText ("v0.3.5", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText (VERSION, getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void GranularTextureEngineAudioProcessorEditor::resized()
