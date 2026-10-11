@@ -5,7 +5,7 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 #include <memory>
 
-#define VERSION "v1.0.4"
+#define VERSION "v1.0.5"
 
 typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
@@ -29,6 +29,10 @@ private:
     juce::Label grainLengthLabel;
     juce::Slider grainLengthKnob;
     std::unique_ptr<SliderAttachment> grainLenghtAttachement;
+
+    juce::Label grainRateHzLabel;
+    juce::Slider grainRateHzKnob;
+    std::unique_ptr<SliderAttachment> grainRateHzAttachement;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GranularTextureEngineAudioProcessorEditor)
 };

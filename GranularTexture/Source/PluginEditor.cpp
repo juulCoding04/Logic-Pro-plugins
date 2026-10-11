@@ -24,6 +24,18 @@ GranularTextureEngineAudioProcessorEditor::GranularTextureEngineAudioProcessorEd
     grainLengthLabel.attachToComponent(&grainLengthKnob, false);
 
     grainLenghtAttachement.reset(new SliderAttachment (valueTreeState, "grainLength", grainLengthKnob));
+
+    // --- grain rate Hz ---
+    grainRateHzKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    grainRateHzKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    grainRateHzKnob.setPopupDisplayEnabled(true, false, this);
+    addAndMakeVisible(&grainRateHzKnob);
+
+    grainRateHzLabel.setText("Grain Rate (Hz)", juce::dontSendNotification);
+    grainRateHzLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    grainRateHzLabel.attachToComponent(&grainRateHzKnob, false);
+
+    grainRateHzAttachement.reset(new SliderAttachment(valueTreeState, "grainRate", grainRateHzKnob));
 }
 
 GranularTextureEngineAudioProcessorEditor::~GranularTextureEngineAudioProcessorEditor()
@@ -45,4 +57,5 @@ void GranularTextureEngineAudioProcessorEditor::resized()
 {
     // set position with arguments (x, y, width, height)
     grainLengthKnob.setBounds(40, 30, 100, 100);
+    grainRateHzKnob.setBounds(180, 30, 100, 100);
 }
