@@ -19,3 +19,10 @@ bool GrainScheduler::tick(int numSamples) {
 
     return false;
 }
+
+void GrainScheduler::setInterval(int samples) {
+    if (samples < samplesUntilNextGrain) {
+        samplesUntilNextGrain = samples;
+    }
+    intervalSamples = samples;
+}

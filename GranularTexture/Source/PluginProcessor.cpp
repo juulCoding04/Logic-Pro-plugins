@@ -221,6 +221,10 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     float grainMs = parameters.getRawParameterValue("grainLength")->load();
     float grainLength = static_cast<int>(grainMs * getSampleRate() / 1000.0);
 
+    const float grainRateHz = parameters.getRawParameterValue("grainRate")->load();
+    int grainRateSamples = static_cast<int>(getSampleRate() / grainRateHz);
+
+    scheduler.setInterval(grainRateSamples);
     if (scheduler.tick(bufferSize)) {
         for (int i = 0; i < grains.size(); i++) {
             if (grains[i].isIdle()) {
