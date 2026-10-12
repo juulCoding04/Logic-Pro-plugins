@@ -5,7 +5,7 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 #include <memory>
 
-#define VERSION "v1.0.6"
+#define VERSION "v0.1.0"
 
 typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
