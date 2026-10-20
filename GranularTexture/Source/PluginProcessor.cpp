@@ -232,9 +232,11 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     const float grainRateHz = parameters.getRawParameterValue("grainRate")->load();
     int grainRateSamples = static_cast<int>(getSampleRate() / grainRateHz);
 
+    const int grainPoolLimit = static_cast<int>(parameters.getRawParameterValue("grainPool")->load());
+
     scheduler.setInterval(grainRateSamples);
     if (scheduler.tick(bufferSize)) {
-        for (int i = 0; i < grains.size(); i++) {
+        for (int i = 0; i < grainPoolLimit; i++) {
             if (grains[i].isIdle()) {
                 int newCurrent = writePosition - grainLength;
                 if (newCurrent < 0) {
