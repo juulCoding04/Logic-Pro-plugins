@@ -36,6 +36,18 @@ GranularTextureEngineAudioProcessorEditor::GranularTextureEngineAudioProcessorEd
     grainRateHzLabel.attachToComponent(&grainRateHzKnob, false);
 
     grainRateHzAttachement.reset(new SliderAttachment(valueTreeState, "grainRate", grainRateHzKnob));
+
+    // --- grain pool ---
+    grainPoolSlider.setSliderStyle(juce::Slider::LinearBarVertical);
+    grainPoolSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    grainPoolSlider.setPopupDisplayEnabled(true, false, this);
+    addAndMakeVisible(&grainPoolSlider);
+
+    grainPoolLabel.setText("Pool", juce::dontSendNotification);
+    grainPoolLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    grainPoolLabel.attachToComponent(&grainPoolSlider, false);
+
+    grainPoolAttachement.reset(new SliderAttachment(valueTreeState, "grainPool", grainPoolSlider));
 }
 
 GranularTextureEngineAudioProcessorEditor::~GranularTextureEngineAudioProcessorEditor()
@@ -58,4 +70,5 @@ void GranularTextureEngineAudioProcessorEditor::resized()
     // set position with arguments (x, y, width, height)
     grainLengthKnob.setBounds(40, 30, 100, 100);
     grainRateHzKnob.setBounds(180, 30, 100, 100);
+    grainPoolSlider.setBounds(70, 180, 50, 100);
 }

@@ -58,7 +58,7 @@ private:
 
     GrainScheduler scheduler;
 
-    std::array<Grain, 2> grains;
+    std::array<Grain, 16> grains;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 

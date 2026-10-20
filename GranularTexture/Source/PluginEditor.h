@@ -34,5 +34,9 @@ private:
     juce::Slider grainRateHzKnob;
     std::unique_ptr<SliderAttachment> grainRateHzAttachement;
 
+    juce::Label grainPoolLabel;
+    juce::Slider grainPoolSlider;
+    std::unique_ptr<SliderAttachment> grainPoolAttachement;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GranularTextureEngineAudioProcessorEditor)
 };

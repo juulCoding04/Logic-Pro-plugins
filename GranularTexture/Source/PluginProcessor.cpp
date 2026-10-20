@@ -39,6 +39,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout GranularTextureEngineAudioPr
         4.0f
     ));
 
+    layout.add(std::make_unique<juce::AudioParameterInt>(
+        juce::ParameterID{"grainPool", 1},
+        "Grain pool size",
+        1,      // min
+        16,     // max
+        8       // default
+    ));
+
     return layout;
 }
 
@@ -240,7 +248,7 @@ void GranularTextureEngineAudioProcessor::processBlock (juce::AudioBuffer<float>
     }
 
     // read active grains
-    
+
     for (int i = 0; i < grains.size(); i++) {
         if (grains[i].isIdle())
             continue; // grain is idle so nothing to read
